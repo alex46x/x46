@@ -94,6 +94,7 @@
             Every pixel is intentional. Merging brutalist editorial typography, spatial physics, and tactile interaction design.
           </p>
           <div class="dialogue-pills">
+            <button class="pill-action pill-primary" data-action="explore">Explore selected work ↓</button>
             <button class="pill-action" data-action="talk">Ready to collaborate?</button>
             <button class="pill-action" data-action="reset">Restart ↺</button>
             <button class="pill-action pill-back" data-action="prev">← Back</button>
@@ -192,6 +193,196 @@
     </div>
 
   </main>
+
+  <!-- ==========================================================================
+       EXTENDED EXPLORE PAGE (Slides up seamlessly from bottom, matching #96989C)
+       ========================================================================== -->
+  <section class="explore-page" id="explore-page" aria-hidden="true">
+    <div class="explore-container">
+      
+      <!-- Top Sticky Navigation within Explore View -->
+      <nav class="explore-top-nav">
+        <div class="explore-nav-brand">
+          <span class="brand-monogram">~ M R X ~</span>
+          <span class="explore-nav-label">// SELECTED WORKS & ARCHITECTURE</span>
+        </div>
+        <div class="explore-nav-actions">
+          <button class="pill-action pill-back" id="btn-return-hero">
+            <span>↑ Back to Studio</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Section Header -->
+      <header class="explore-header-block">
+        <div class="explore-meta-badge">[ 01 // ARCHIVE & CRAFT ]</div>
+        <h1 class="explore-hero-title">Spatial Architecture, Real-Time WebGL & Digital Systems.</h1>
+        <p class="explore-hero-desc">
+          Merging GPU-accelerated 3D shaders, brutalist editorial typography, and tactile interaction design into seamless 60fps web experiences.
+        </p>
+      </header>
+
+      <!-- Selected Works Showcase -->
+      <div class="explore-works-grid">
+        
+        <!-- Project 01 -->
+        <article class="work-card">
+          <div class="work-card-meta">
+            <span class="work-index">01</span>
+            <div class="work-tags">
+              <span class="tag-pill">Three.js</span>
+              <span class="tag-pill">GLSL Shaders</span>
+              <span class="tag-pill">Web Audio API</span>
+            </div>
+            <span class="work-year">2026</span>
+          </div>
+          <div class="work-card-content">
+            <h2 class="work-title">LISA Spatial 3D Experience</h2>
+            <p class="work-desc">
+              Real-time WebGL interactive portrait environment inspired by Locomotive L.I.S.A., featuring procedural circular snow dynamics, ambient studio lighting, and audio-reactive harmonic pulses.
+            </p>
+          </div>
+          <div class="work-card-footer">
+            <span class="work-status">Live Production System</span>
+            <span class="work-arrow-pill">Explore Architecture ↗</span>
+          </div>
+        </article>
+
+        <!-- Project 02 -->
+        <article class="work-card">
+          <div class="work-card-meta">
+            <span class="work-index">02</span>
+            <div class="work-tags">
+              <span class="tag-pill">Creative Dev</span>
+              <span class="tag-pill">Tactile Physics</span>
+              <span class="tag-pill">Vite</span>
+            </div>
+            <span class="work-year">2026</span>
+          </div>
+          <div class="work-card-content">
+            <h2 class="work-title">Monolith Editorial Platform</h2>
+            <p class="work-desc">
+              Minimalist brutalist digital showroom engineered with fluid smooth-scrolling architecture, custom state machines, and micro-physics cursor interactions.
+            </p>
+          </div>
+          <div class="work-card-footer">
+            <span class="work-status">Client Release</span>
+            <span class="work-arrow-pill">View Showcase ↗</span>
+          </div>
+        </article>
+
+        <!-- Project 03 -->
+        <article class="work-card">
+          <div class="work-card-meta">
+            <span class="work-index">03</span>
+            <div class="work-tags">
+              <span class="tag-pill">Spatial Math</span>
+              <span class="tag-pill">WebGL</span>
+              <span class="tag-pill">Vector Fields</span>
+            </div>
+            <span class="work-year">2025</span>
+          </div>
+          <div class="work-card-content">
+            <h2 class="work-title">Aura Generative Particle Engine</h2>
+            <p class="work-desc">
+              High-throughput mathematical vector field particle simulation capable of rendering 100,000+ dynamic points in real-time with zero frame drops.
+            </p>
+          </div>
+          <div class="work-card-footer">
+            <span class="work-status">Open Experiment</span>
+            <span class="work-arrow-pill">Launch Demo ↗</span>
+          </div>
+        </article>
+
+        <!-- Project 04 -->
+        <article class="work-card">
+          <div class="work-card-meta">
+            <span class="work-index">04</span>
+            <div class="work-tags">
+              <span class="tag-pill">Variable Fonts</span>
+              <span class="tag-pill">Micro-Interactions</span>
+              <span class="tag-pill">Front-End</span>
+            </div>
+            <span class="work-year">2025</span>
+          </div>
+          <div class="work-card-content">
+            <h2 class="work-title">Kinetics Type Foundry Specimen</h2>
+            <p class="work-desc">
+              Interactive typography showcase with real-time velocity-driven letterform deformation, audio-reactive glyphs, and high-DPI font rendering.
+            </p>
+          </div>
+          <div class="work-card-footer">
+            <span class="work-status">Design System</span>
+            <span class="work-arrow-pill">Inspect Specimen ↗</span>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Technical Disciplines -->
+      <section class="explore-disciplines-section">
+        <div class="explore-meta-badge">[ 02 // TECHNICAL DISCIPLINES ]</div>
+        <h3 class="disciplines-heading">Engineering Pillars</h3>
+        
+        <div class="disciplines-grid">
+          <div class="discipline-card">
+            <span class="disc-num">01</span>
+            <h4 class="disc-title">WebGL & Spatial Shaders</h4>
+            <p class="disc-desc">
+              Custom GLSL vertex & fragment shaders, Three.js scene architecture, procedural particles, GPU object-fit coverage, and post-processing.
+            </p>
+          </div>
+
+          <div class="discipline-card">
+            <span class="disc-num">02</span>
+            <h4 class="disc-title">Front-End Architecture</h4>
+            <p class="disc-desc">
+              Ultra-lightweight vanilla JS/Vite stacks, zero-bloat state management, sub-200ms production builds, and accessible semantic HTML5.
+            </p>
+          </div>
+
+          <div class="discipline-card">
+            <span class="disc-num">03</span>
+            <h4 class="disc-title">Tactile Micro-Interactions</h4>
+            <p class="disc-desc">
+              Web Audio API sound engines, smooth lerped cursor forces, aerodynamic particle repulsion, and bi-directional gesture choreography.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Collaboration & Contact Callout -->
+      <section class="explore-cta-section">
+        <div class="explore-meta-badge">[ 03 // COLLABORATION ]</div>
+        <h2 class="cta-title">Ready to engineer a bespoke spatial experience?</h2>
+        <p class="cta-desc">
+          I collaborate with forward-thinking brands, studios, and agencies to build high-performance creative web products.
+        </p>
+        <div class="cta-actions">
+          <button class="pill-action pill-primary" id="btn-explore-talk">
+            <span>Start a project brief →</span>
+          </button>
+          <button class="pill-action copy-pill" id="btn-explore-copy-email" data-email="hello@portfolio.design">
+            <span>Write us: hello@portfolio.design</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M8.5 3.5V2C8.5 1.44772 8.05228 1 7.5 1H2C1.44772 1 1 1.44772 1 2V7.5C1 8.05228 1.44772 8.5 2 8.5H3.5" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+          </button>
+          <button class="pill-action pill-back" id="btn-bottom-return">
+            <span>↑ Return to Studio</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Footer Metadata -->
+      <footer class="explore-footer">
+        <span>~ M R X ~ © 2026. ALL RIGHTS RESERVED.</span>
+        <span>CRAFTED WITH THREE.JS & BESPOKE WEB ARCHITECTURE.</span>
+      </footer>
+
+    </div>
+  </section>
 
   <script type="module" src="./src/main.js"></script>
 </body>

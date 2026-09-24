@@ -6,12 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const scene = new BackgroundScene('webgl-canvas');
 
   // DOM Elements
+  const heroViewport = document.getElementById('lisa-viewport');
+  const explorePage = document.getElementById('explore-page');
   const dialogueStream = document.getElementById('dialogue-stream');
   const contactFlow = document.getElementById('lisa-contact-flow');
   const scrollHelper = document.getElementById('scroll-helper-hint');
   const talkBtn = document.getElementById('btn-talk');
   const resetBtn = document.getElementById('btn-reset');
   const soundCapsule = document.getElementById('sound-capsule');
+
+  const btnReturnHero = document.getElementById('btn-return-hero');
+  const btnBottomReturn = document.getElementById('btn-bottom-return');
+  const btnExploreTalk = document.getElementById('btn-explore-talk');
+  const btnExploreCopyEmail = document.getElementById('btn-explore-copy-email');
 
   // ----------------------------------------------------
   // 2. Locomotive LISA Dialogue Stream Controller (Overview)
@@ -21,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentStep = 0;
   let isScrolling = false;
   let isFormMode = false;
+  let isExploreOpen = false;
 
   function updateSteps(newStep) {
     if (newStep < 0 || newStep >= totalSteps) return;
@@ -36,24 +44,95 @@ document.addEventListener('DOMContentLoaded', () => {
       if (idx === currentStep) {
         step.classList.add('active');
       } else if (idx === currentStep - 1) {
-        // Immediately previous step: Blurred above (like user screenshot)
+        // Immediately previous step: Blurred above
         step.classList.add('past');
       } else {
         // Older or future steps: Hidden
         step.classList.add('upcoming');
       }
     });
+
+    // Update scroll helper text hint
+    if (scrollHelper) {
+      const hintText = scrollHelper.querySelector('.scroll-hint-text');
+      if (hintText) {
+        if (currentStep === totalSteps - 1) {
+          hintText.textContent = 'SCROLL DOWN TO REVEAL SELECTED WORKS // SCROLL UP TO REWIND';
+        } else {
+          hintText.textContent = 'SCROLL DOWN TO ADVANCE // SCROLL UP TO REWIND';
+        }
+      }
+    }
+  }
+
+  // ----------------------------------------------------
+  // 3. Extended Page Transition (Hero blurs out FIRST, then next page slides up)
+  // ----------------------------------------------------
+  function openExplorePage() {
+    if (isExploreOpen || isFormMode) return;
+    isExploreOpen = true;
+    sound.playClick();
+
+    // PHASE 1: Smoothly blur out the entire hero section (portrait canvas, vignette, text, header)
+    document.body.classList.add('stage-blur');
+    if (scene) scene.setExploreMode(true);
+
+    // PHASE 2: THEN smoothly slide up the next page from bottom with calm pacing
+    setTimeout(() => {
+      if (explorePage && isExploreOpen) {
+        explorePage.classList.add('active');
+        explorePage.setAttribute('aria-hidden', 'false');
+        explorePage.scrollTop = 0;
+      }
+    }, 520);
+  }
+
+  function closeExplorePage() {
+    if (!isExploreOpen) return;
+    isExploreOpen = false;
+    sound.playClick();
+
+    // PHASE 1: Slide next page back down
+    if (explorePage) {
+      explorePage.classList.remove('active');
+      explorePage.setAttribute('aria-hidden', 'true');
+    }
+
+    // PHASE 2: THEN smoothly un-blur the hero section back into crystal sharpness
+    setTimeout(() => {
+      if (!isExploreOpen) {
+        document.body.classList.remove('stage-blur');
+        if (scene) scene.setExploreMode(false);
+      }
+    }, 550);
   }
 
   // Scroll Wheel / Trackpad Gesture Handler
   window.addEventListener('wheel', (e) => {
     if (isFormMode || isScrolling) return;
 
+    // When on Explore page, check if user scrolled to top and is scrolling up
+    if (isExploreOpen) {
+      if (explorePage && explorePage.scrollTop <= 5 && e.deltaY < -25) {
+        isScrolling = true;
+        closeExplorePage();
+        setTimeout(() => { isScrolling = false; }, 900);
+      }
+      return;
+    }
+
     if (Math.abs(e.deltaY) > 25) {
       isScrolling = true;
 
       if (e.deltaY > 0) {
-        if (currentStep < totalSteps - 1) updateSteps(currentStep + 1);
+        if (currentStep < totalSteps - 1) {
+          updateSteps(currentStep + 1);
+        } else if (currentStep === totalSteps - 1 && !isExploreOpen) {
+          // Finished left side items -> Reveal next page from bottom
+          openExplorePage();
+          setTimeout(() => { isScrolling = false; }, 900);
+          return;
+        }
       } else {
         if (currentStep > 0) updateSteps(currentStep - 1);
       }
@@ -74,12 +153,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
       if (Math.abs(deltaY) > 40) {
         isScrolling = true;
-        if (deltaY > 0 && currentStep < totalSteps - 1) {
-          updateSteps(currentStep + 1);
-        } else if (deltaY < 0 && currentStep > 0) {
-          updateSteps(currentStep - 1);
+        if (deltaY > 0) {
+          // Swipe up / scroll down
+          if (currentStep < totalSteps - 1) {
+            updateSteps(currentStep + 1);
+          } else if (currentStep === totalSteps - 1 && !isExploreOpen) {
+            openExplorePage();
+          }
+        } else {
+          // Swipe down / scroll up
+          if (isExploreOpen && explorePage && explorePage.scrollTop <= 5) {
+            closeExplorePage();
+          } else if (currentStep > 0) {
+            updateSteps(currentStep - 1);
+          }
         }
-        setTimeout(() => { isScrolling = false; }, 500);
+        setTimeout(() => { isScrolling = false; }, 800);
       }
     }
   }, { passive: true });
@@ -92,6 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (action === 'talk') {
         openContactFlow();
+      } else if (action === 'explore') {
+        openExplorePage();
       } else if (action === 'next') {
         if (currentStep < totalSteps - 1) updateSteps(currentStep + 1);
       } else if (action === 'prev') {
@@ -102,8 +193,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Explore page navigation buttons
+  if (btnReturnHero) btnReturnHero.addEventListener('click', closeExplorePage);
+  if (btnBottomReturn) btnBottomReturn.addEventListener('click', closeExplorePage);
+  if (btnExploreTalk) {
+    btnExploreTalk.addEventListener('click', () => {
+      closeExplorePage();
+      openContactFlow();
+    });
+  }
+
+  if (btnExploreCopyEmail) {
+    btnExploreCopyEmail.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const email = btnExploreCopyEmail.dataset.email || 'hello@portfolio.design';
+      try {
+        await navigator.clipboard.writeText(email);
+        sound.playChime(660, 0.05, 0.3);
+
+        const span = btnExploreCopyEmail.querySelector('span');
+        if (span) {
+          const originalText = span.textContent;
+          span.textContent = '✓ Copied to clipboard!';
+          btnExploreCopyEmail.style.background = '#FFFFFF';
+          btnExploreCopyEmail.style.borderColor = '#10B981';
+
+          setTimeout(() => {
+            span.textContent = originalText;
+            btnExploreCopyEmail.style.background = '';
+            btnExploreCopyEmail.style.borderColor = '';
+          }, 2000);
+        }
+      } catch (err) {
+        console.warn('Clipboard write failed:', err);
+      }
+    });
+  }
+
   // ----------------------------------------------------
-  // 3. Conversational Contact Form Flow (Locomotive LISA Style)
+  // 4. Conversational Contact Form Flow (Locomotive LISA Style)
   // ----------------------------------------------------
   const flowPrevBlur = document.getElementById('flow-prev-blur');
   const flowPromptText = document.getElementById('flow-prompt-text');
@@ -184,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function openContactFlow() {
+    if (isExploreOpen) closeExplorePage();
     isFormMode = true;
     dialogueStream.style.display = 'none';
     contactFlow.style.display = 'flex';
@@ -245,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ----------------------------------------------------
-  // 4. Header & Global Controls
+  // 5. Header & Global Controls
   // ----------------------------------------------------
   // "Let's talk" Header Button
   if (talkBtn) {
@@ -261,7 +390,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reset Button (↺)
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
+      if (isExploreOpen) closeExplorePage();
       if (isFormMode) closeContactFlow();
+      document.body.classList.remove('stage-blur');
       updateSteps(0);
       if (scene) scene.reset();
       sound.playChime(440, 0.04, 0.3);
@@ -318,8 +449,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Escape') closeContactFlow();
       return;
     }
+    if (isExploreOpen) {
+      if (e.key === 'Escape') closeExplorePage();
+      return;
+    }
     if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-      if (currentStep < totalSteps - 1) updateSteps(currentStep + 1);
+      if (currentStep < totalSteps - 1) {
+        updateSteps(currentStep + 1);
+      } else if (currentStep === totalSteps - 1) {
+        openExplorePage();
+      }
     } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
       if (currentStep > 0) updateSteps(currentStep - 1);
     }

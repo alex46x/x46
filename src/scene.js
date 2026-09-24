@@ -353,6 +353,16 @@ export class BackgroundScene {
   }
 
   /**
+   * Set explore page mode (soften background particles while viewing projects)
+   */
+  setExploreMode(active) {
+    this.isExploreMode = active;
+    if (this.particleMaterial && this.particleMaterial.uniforms.u_opacityFactor) {
+      this.particleMaterial.uniforms.u_opacityFactor.value = active ? 0.35 : 1.0;
+    }
+  }
+
+  /**
    * Set audio playback state
    */
   setAudioActive(active) {
