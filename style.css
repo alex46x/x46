@@ -1,0 +1,527 @@
+/* ==========================================================================
+   PORTFOLIO 3D — EXACT LOCOMOTIVE L.I.S.A. STYLE
+   Color: #96989C (Studio Neutral Grey)
+   Stance: Ultra-Minimalist Single Viewport, Static Portrait, Text-Blur on Scroll
+   ========================================================================== */
+
+:root {
+  --bg-canvas: #96989C;
+  --text-primary: #0E0F12;
+  --text-secondary: #2C2E33;
+  --text-muted: #565960;
+  
+  --surface-pill: rgba(255, 255, 255, 0.75);
+  --surface-pill-hover: #FFFFFF;
+  --border-hairline: rgba(14, 15, 18, 0.12);
+  --border-pill: rgba(255, 255, 255, 0.8);
+
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Single page viewport — no scrollbar */
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Studio Ambient Background WebGL Canvas */
+.webgl-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.studio-ambient-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    circle at 50% 45%, 
+    transparent 40%, 
+    rgba(130, 132, 136, 0.3) 85%, 
+    rgba(105, 107, 111, 0.45) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+/* ==========================================================================
+   TOP HEADER (LOCOMOTIVE STYLE)
+   ========================================================================== */
+
+.lisa-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 72px;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.brand-monogram {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.brand-monogram:hover {
+  opacity: 0.7;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  opacity: 0.8;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-talk {
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-talk:hover {
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   MAIN VIEWPORT
+   ========================================================================== */
+
+.lisa-viewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 10;
+}
+
+
+
+/* ==========================================================================
+   INTERACTIVE DIALOGUE FEED (THE RED BOX IN SCREENSHOT)
+   Text blurs on scroll, active text is sharp and prominent
+   ========================================================================== */
+
+.dialogue-feed-container {
+  position: absolute;
+  bottom: 14vh;
+  left: 6vw;
+  width: 520px;
+  max-width: 42vw;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+
+.dialogue-stream {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dialogue-step {
+  display: flex;
+  flex-direction: column;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* PAST / SCROLLED STEP: BLURRED (Matches the user's red box!) */
+.dialogue-step.past {
+  filter: blur(4.5px);
+  opacity: 0.32;
+  transform: translateY(-8px) scale(0.98);
+  pointer-events: none;
+  margin-bottom: 24px;
+}
+
+.dialogue-step.past .dialogue-pills {
+  display: none; /* Hide old pills to keep view ultra clean */
+}
+
+/* ACTIVE STEP: SHARP & PROMINENT */
+.dialogue-step.active {
+  filter: blur(0px);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* UPCOMING STEPS: HIDDEN UNTIL SCROLLED */
+.dialogue-step.upcoming {
+  display: none;
+}
+
+.dialogue-text {
+  font-family: var(--font-body);
+  font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 22px;
+}
+
+/* Action Pill Buttons (Locomotive Style) */
+.dialogue-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pill-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-pill);
+  border: 1px solid var(--border-pill);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px -4px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pill-action:hover {
+  background: var(--surface-pill-hover);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.12);
+  border-color: #FFFFFF;
+}
+
+.pill-action.copy-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.pill-action.pill-back {
+  background: rgba(14, 15, 18, 0.08);
+  border-color: rgba(14, 15, 18, 0.12);
+}
+
+.pill-action.pill-primary {
+  background: var(--text-primary);
+  color: var(--bg-canvas);
+  border-color: var(--text-primary);
+}
+
+.pill-action.pill-primary:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* Scroll Helper */
+.scroll-helper-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  opacity: 0.45;
+}
+
+.scroll-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  animation: pulseHint 2s infinite ease-out;
+}
+
+@keyframes pulseHint {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.5); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+.scroll-hint-text {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   CONVERSATIONAL CONTACT FORM FLOW (LOCOMOTIVE LISA STYLE)
+   ========================================================================== */
+
+.lisa-contact-flow {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  animation: fadeInFlow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInFlow {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.flow-previous-blur {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+  filter: blur(4.5px);
+  opacity: 0.35;
+  margin-bottom: 22px;
+  pointer-events: none;
+  min-height: 1.4em;
+  transition: all 0.4s ease;
+}
+
+.flow-previous-blur:empty {
+  display: none;
+}
+
+.flow-active-box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.flow-prompt {
+  margin-bottom: 24px;
+}
+
+.flow-input-line-wrap {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.input-underline-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1.5px solid rgba(14, 15, 18, 0.28);
+  padding-bottom: 6px;
+  transition: border-color 0.25s ease;
+}
+
+.input-underline-group:focus-within {
+  border-bottom-color: #0E0F12;
+}
+
+.flow-underline-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  font-weight: 500;
+  color: #0E0F12;
+  outline: none;
+  padding: 4px 0;
+}
+
+.flow-underline-input::placeholder {
+  color: rgba(14, 15, 18, 0.42);
+  font-weight: 400;
+}
+
+/* Submit Arrow Pill Button (Matches User Screenshot) */
+.flow-arrow-btn {
+  background: #FFFFFF;
+  color: #0E0F12;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  width: 38px;
+  height: 28px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.flow-arrow-btn:hover {
+  transform: translateX(3px);
+  background: #0E0F12;
+  color: #FFFFFF;
+  box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.2);
+}
+
+.flow-navigation-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.flow-progress {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.flow-success-box {
+  display: flex;
+  flex-direction: column;
+  animation: fadeInFlow 0.4s ease;
+}
+
+/* ==========================================================================
+   FLOATING CONTROLS (BOTTOM CORNERS)
+   ========================================================================== */
+
+/* Bottom Left: Reset Button (↺) */
+.bottom-left-control {
+  position: fixed;
+  bottom: 32px;
+  left: 40px;
+  z-index: 50;
+}
+
+.btn-circle-control {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #0E0F12;
+  color: #FFFFFF;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
+}
+
+.btn-circle-control:hover {
+  transform: rotate(-45deg) scale(1.05);
+  background: #000;
+}
+
+/* Bottom Right: Sound Toggle Capsule (Speaker Pill) */
+.bottom-right-control {
+  position: fixed;
+  bottom: 32px;
+  right: 40px;
+  z-index: 50;
+}
+
+.sound-capsule-lisa {
+  width: 44px;
+  height: 72px;
+  background: #0E0F12;
+  border-radius: 999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
+}
+
+.sound-capsule-lisa:hover {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.sound-speaker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sound-speaker-icon .icon-active {
+  display: none;
+}
+
+.sound-capsule-lisa.active .sound-speaker-icon .icon-muted {
+  display: none;
+}
+
+.sound-capsule-lisa.active .sound-speaker-icon .icon-active {
+  display: block;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .dialogue-feed-container {
+    bottom: 10vh;
+    left: 5vw;
+    width: 90vw;
+    max-width: 90vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .lisa-header {
+    padding: 0 20px;
+  }
+
+  .header-center {
+    display: none;
+  }
+
+  .bottom-left-control {
+    bottom: 20px;
+    left: 20px;
+  }
+
+  .bottom-right-control {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .dialogue-text {
+    font-size: 1.25rem;
+  }
+}
