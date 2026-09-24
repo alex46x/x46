@@ -205,9 +205,17 @@ export class BackgroundScene {
 
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
     const alphas = new Float32Array(count);
     const snowData = [];
+
+    // Requested Studio Palette: #565759, #A0A1A4, #343539
+    const palette = [
+      new THREE.Color('#565759'),
+      new THREE.Color('#A0A1A4'),
+      new THREE.Color('#343539')
+    ];
 
     for (let i = 0; i < count; i++) {
       // 3D frustum space in front of portrait
@@ -223,6 +231,12 @@ export class BackgroundScene {
       velocities[i * 3 + 1] = 0;
       velocities[i * 3 + 2] = 0;
 
+      // Assign palette color
+      const chosenColor = palette[Math.floor(Math.random() * palette.length)];
+      colors[i * 3] = chosenColor.r;
+      colors[i * 3 + 1] = chosenColor.g;
+      colors[i * 3 + 2] = chosenColor.b;
+
       // Realistic snow variety: delicate background flakes + large dreamy bokeh foreground flakes
       const isBokeh = Math.random() < 0.16;
       sizes[i] = isBokeh
@@ -231,18 +245,20 @@ export class BackgroundScene {
 
       // Soft translucency
       alphas[i] = isBokeh
-        ? Math.random() * 0.35 + 0.25  // Softer large bokeh
-        : Math.random() * 0.45 + 0.40; // Crisp falling flakes
+        ? Math.random() * 0.40 + 0.30  // Softer large bokeh
+        : Math.random() * 0.55 + 0.45; // Crisp falling flakes
 
+      // Slower, graceful floating snowfall speed
       snowData.push({
-        speed: Math.random() * 0.016 + 0.008, // Gentle downward snowfall
-        swaySpeed: Math.random() * 1.6 + 0.8,
-        swayAmp: Math.random() * 0.012 + 0.006,
+        speed: Math.random() * 0.005 + 0.0025, // Reduced speed
+        swaySpeed: Math.random() * 1.0 + 0.5,
+        swayAmp: Math.random() * 0.008 + 0.003,
         swayOffset: Math.random() * Math.PI * 2
       });
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
     geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
     geometry.setAttribute('aAlpha', new THREE.BufferAttribute(alphas, 1));
 
@@ -250,7 +266,7 @@ export class BackgroundScene {
     this.particleVelocities = velocities;
     this.snowData = snowData;
 
-    // Custom ShaderMaterial: 100% CIRCULAR with Gaussian-style soft blur edges
+    // Custom ShaderMaterial: 100% CIRCULAR with Gaussian-style soft blur edges and custom palette
     const snowMaterial = new THREE.ShaderMaterial({
       uniforms: {
         u_time: { value: 0 },
@@ -259,10 +275,13 @@ export class BackgroundScene {
       vertexShader: `
         attribute float aSize;
         attribute float aAlpha;
+        attribute vec3 aColor;
         varying float vAlpha;
+        varying vec3 vColor;
 
         void main() {
           vAlpha = aAlpha;
+          vColor = aColor;
           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
           // Perspective sizing: closer flakes appear larger & softer like real snow bokeh
           gl_PointSize = aSize * (360.0 / -mvPosition.z);
@@ -272,6 +291,7 @@ export class BackgroundScene {
       fragmentShader: `
         uniform float u_opacityFactor;
         varying float vAlpha;
+        varying vec3 vColor;
 
         void main() {
           // Circular discard: Eliminates all square edges!
@@ -284,8 +304,8 @@ export class BackgroundScene {
           float coreGlow = smoothstep(0.24, 0.0, dist) * 0.45;
           float alpha = (softCircle + coreGlow) * vAlpha * u_opacityFactor;
 
-          // Crisp frosty snow white color
-          gl_FragColor = vec4(0.98, 0.99, 1.0, alpha);
+          // Render with specific palette color
+          gl_FragColor = vec4(vColor, alpha);
         }
       `,
       transparent: true,
